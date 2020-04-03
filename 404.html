@@ -6,11 +6,27 @@
     <title>Short URL App</title>
     <script type="text/javascript">
         (function () {
+            fetch('meta.json')
+                .then(response => response.json())
+                .then(meta => {
+                    let fragment = location.pathname.split('/').pop();
+                    let info = meta[fragment];
+                    console.log(`info, ${info}`);
+                    if (info) {
+                        let metaTag = document.createElement('meta');
+                        metaTag.property = 'og:description';
+                        metaTag.content = info['og-description'];
+                        document.getElementsByTagName('head')[0].appendChild(metaTag);
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
             fetch('routes.json')
                 .then(response => response.json())
                 .then(routes => {
-                    var fragment = location.pathname.split('/').pop();
-                    var url = routes[fragment];
+                    let fragment = location.pathname.split('/').pop();
+                    let url = routes[fragment];
                     console.log(`${fragment}, ${url}`);
                     location.href = url ? url : './index.html';
                 })

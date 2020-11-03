@@ -22,7 +22,7 @@
                 .catch(error => {
                     console.log(error);
                 });
-            fetch('routes.json')
+            fetch(`routes.json?t=${Date.now()}`)
                 .then(response => response.json())
                 .then(routes => {
                     let fragment = location.pathname.split('/').pop();

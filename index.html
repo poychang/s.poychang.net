@@ -1,32 +1,305 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-Hant">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Short URL App</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Poy Chang - 短網址服務</title>
+    <meta name="description" content="一個簡單又漂亮的短網址服務，支援搜尋、快速複製與分享。" />
     <style>
-        .center {
-            width: calc(100vw - 10px);
-            height: calc(100vh - 10px);
-            margin: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        :root {
+            --bg-start: #0ea5e9; /* sky-500 */
+            --bg-end: #7c3aed;   /* violet-600 */
+            --text: #0b1220;
+            --muted: #586174;
+            --card: rgba(255, 255, 255, 0.72);
+            --card-strong: rgba(255, 255, 255, 0.82);
+            --border: rgba(255, 255, 255, 0.35);
+            --shadow: 0 10px 30px rgba(2, 8, 23, 0.25);
+            --brand: #7c3aed;
+            --brand-2: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
         }
 
-        .content {
-            text-align: center;
-            width: 400px;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text: #e6e6e6;
+                --muted: #a1a1aa;
+                --card: rgba(16, 18, 27, 0.58);
+                --card-strong: rgba(16, 18, 27, 0.72);
+                --border: rgba(255, 255, 255, 0.12);
+                --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            }
         }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--text);
+            background: linear-gradient(120deg, var(--bg-start), var(--bg-end));
+            background-attachment: fixed;
+        }
+
+        /* subtle noise overlay */
+        .noise {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.04"/></svg>');
+            background-size: 300px 300px;
+        }
+
+        .container {
+            width: min(1100px, 92%);
+            margin: 48px auto 64px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px) saturate(120%);
+            -webkit-backdrop-filter: blur(14px) saturate(120%);
+            border-radius: 20px;
+        }
+
+        .hero {
+            padding: 28px 28px 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 16px;
+        }
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 36px);
+            letter-spacing: 0.3px;
+        }
+        .hero p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--card-strong);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--text);
+            text-decoration: none;
+            transition: transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,.10);
+        }
+        .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.16); }
+        .chip svg { width: 16px; height: 16px; opacity: .8; }
+
+        .search {
+            margin-top: 14px;
+            padding: 0 18px 18px;
+        }
+        .searchbar {
+            display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+            background: var(--card-strong);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 12px 10px 14px;
+        }
+        .searchbar input {
+            border: 0; outline: 0; background: transparent; color: var(--text);
+            font-size: 15px;
+        }
+        .meta {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 12px;
+            color: var(--muted); font-size: 13px;
+        }
+
+        .list { margin-top: 14px; padding: 10px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .item {
+            background: var(--card-strong);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            display: grid;
+            grid-template-rows: auto auto auto;
+            gap: 8px;
+            transition: transform .12s ease, box-shadow .12s ease;
+        }
+        .item:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.15); }
+        .alias { font-weight: 700; letter-spacing: .3px; }
+        .target a { color: var(--muted); text-decoration: none; word-break: break-all; }
+        .target a:hover { text-decoration: underline; }
+        .short { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; color: var(--muted); }
+
+        .actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
+            background: #ffffffc7; color: #111827; text-decoration: none; cursor: pointer;
+        }
+        @media (prefers-color-scheme: dark) { .btn { background: rgba(255,255,255,0.06); color: var(--text); } }
+        .btn:hover { filter: brightness(1.05); }
+        .btn svg { width: 16px; height: 16px; }
+
+        .empty { text-align: center; color: var(--muted); padding: 28px; }
+
+        .footer { margin-top: 18px; padding: 14px 18px; text-align: center; color: var(--muted); font-size: 12px; }
+
+        /* toast */
+        .toast {
+            position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+            background: var(--card-strong);
+            border: 1px solid var(--border);
+            border-radius: 999px; padding: 10px 14px; color: var(--text);
+            box-shadow: var(--shadow);
+            opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
     </style>
 </head>
 
 <body>
-    <div class="center">
-        <div class="content">
-            <h1>Poy Chang - Short URL App</h1>
-        </div>
-    </div>
+    <div class="noise" aria-hidden="true"></div>
+    <main class="container">
+        <section class="hero card">
+            <div>
+                <h1>短網址服務 · s.poychang.net</h1>
+                <p>快速分享、好看好記的短網址清單，支援搜尋與一鍵複製。</p>
+                <div id="chips" class="chips" aria-label="快速連結"></div>
+            </div>
+        </section>
+
+        <section class="search">
+            <div class="searchbar card">
+                <input id="q" type="search" placeholder="搜尋別名或目標網址… (e.g. blog, github)" aria-label="搜尋別名或目標網址" />
+                <div class="meta"><span id="count">載入中…</span></div>
+            </div>
+        </section>
+
+        <section class="list card">
+            <div id="grid" class="grid" aria-live="polite"></div>
+            <div id="empty" class="empty" hidden>查無結果</div>
+        </section>
+
+        <div class="footer card">本服務使用 GitHub Pages + 404 重新導向。新增/修改短網址請更新 <code>routes.json</code>。</div>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite">已複製短網址</div>
+
+    <script>
+        (function () {
+            const $ = (sel) => document.querySelector(sel);
+            const grid = $('#grid');
+            const empty = $('#empty');
+            const count = $('#count');
+            const q = $('#q');
+            const chips = $('#chips');
+            const toast = $('#toast');
+
+            const base = (location && location.protocol.startsWith('http')) ? location.origin : 'https://s.poychang.net';
+
+            const iconCopy = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3V7Zm3-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-7Z"/><path d="M3 10a3 3 0 0 1 3-3h1a1 1 0 1 1 0 2H6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a1 1 0 1 1 2 0v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8Z"/></svg>';
+            const iconExternal = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3a1 1 0 1 0 0 2h4.586l-6.293 6.293a1 1 0 1 0 1.414 1.414L19 6.414V11a1 1 0 1 0 2 0V4a1 1 0 0 0-1-1h-7Z"/><path d="M5 6a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3v-2a1 1 0 1 0-2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5Z"/></svg>';
+
+            function toastMsg(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 1400);
+            }
+
+            function truncate(str, n) {
+                if (!str) return '';
+                return str.length > n ? str.slice(0, n - 1) + '…' : str;
+            }
+
+            function shortUrl(alias) {
+                return `${base}/${alias}`;
+            }
+
+            function makeItem(alias, url) {
+                const div = document.createElement('div');
+                div.className = 'item';
+                const short = shortUrl(alias);
+                div.innerHTML = `
+                    <div class="alias">${alias}</div>
+                    <div class="target"><a href="${url}" target="_blank" rel="noopener">${truncate(url, 64)}</a></div>
+                    <div class="short">${short}</div>
+                    <div class="actions">
+                        <button class="btn btn-copy" data-copy="${short}" aria-label="複製短網址">${iconCopy}<span>複製</span></button>
+                        <a class="btn" href="${short}" target="_blank" rel="noopener" aria-label="開啟短網址">${iconExternal}<span>開啟</span></a>
+                    </div>
+                `;
+                const copyBtn = div.querySelector('.btn-copy');
+                copyBtn.addEventListener('click', async () => {
+                    const text = copyBtn.getAttribute('data-copy');
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const ta = document.createElement('textarea');
+                            ta.value = text; document.body.appendChild(ta); ta.select();
+                            document.execCommand('copy'); document.body.removeChild(ta);
+                        }
+                        toastMsg('已複製短網址');
+                    } catch (e) {
+                        console.error(e);
+                        toastMsg('複製失敗');
+                    }
+                });
+                return div;
+            }
+
+            function render(list) {
+                grid.innerHTML = '';
+                if (!list || list.length === 0) {
+                    empty.hidden = false;
+                    count.textContent = '0 筆結果';
+                    return;
+                }
+                empty.hidden = true;
+                for (const [alias, url] of list) {
+                    grid.appendChild(makeItem(alias, url));
+                }
+                count.textContent = `${list.length} 筆結果`;
+            }
+
+            function setupSearch(entries) {
+                q.addEventListener('input', () => {
+                    const term = q.value.trim().toLowerCase();
+                    if (!term) return render(entries);
+                    const filtered = entries.filter(([alias, url]) =>
+                        alias.toLowerCase().includes(term) || url.toLowerCase().includes(term)
+                    );
+                    render(filtered);
+                });
+            }
+
+            fetch(`routes.json?t=${Date.now()}`)
+                .then(r => r.json())
+                .then(routes => {
+                    const entries = Object.entries(routes);//.sort((a, b) => a[0].localeCompare(b[0]));
+                    render(entries);
+                    setupSearch(entries);
+                })
+                .catch(err => {
+                    console.error(err);
+                    count.textContent = '載入失敗，請稍後再試。';
+                    empty.hidden = false;
+                });
+        })();
+    </script>
 </body>
 
 </html>

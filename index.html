@@ -1,305 +1,323 @@
 <!doctype html>
 <html lang="zh-Hant">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Poy Chang - 短網址服務</title>
-    <meta name="description" content="一個簡單又漂亮的短網址服務，支援搜尋、快速複製與分享。" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f5f0">
+    <title>Poy Chang — 短網址</title>
+    <meta name="description" content="快速找到並分享 Poy Chang 的常用短網址。">
     <style>
         :root {
-            --bg-start: #0ea5e9; /* sky-500 */
-            --bg-end: #7c3aed;   /* violet-600 */
-            --text: #0b1220;
-            --muted: #586174;
-            --card: rgba(255, 255, 255, 0.72);
-            --card-strong: rgba(255, 255, 255, 0.82);
-            --border: rgba(255, 255, 255, 0.35);
-            --shadow: 0 10px 30px rgba(2, 8, 23, 0.25);
-            --brand: #7c3aed;
-            --brand-2: #0ea5e9;
-            --success: #10b981;
-            --danger: #ef4444;
+            color-scheme: light;
+            --paper: #f5f5f0;
+            --surface: #fff;
+            --ink: #17201c;
+            --muted: #747c76;
+            --line: #e5e8e1;
+            --green: #c5f264;
+            --green-dark: #25351a;
+            --radius: 18px;
+            --shadow: 0 20px 60px rgba(28, 39, 30, .07);
         }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --text: #e6e6e6;
-                --muted: #a1a1aa;
-                --card: rgba(16, 18, 27, 0.58);
-                --card-strong: rgba(16, 18, 27, 0.72);
-                --border: rgba(255, 255, 255, 0.12);
-                --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-            }
-        }
-
         * { box-sizing: border-box; }
-        html, body { height: 100%; }
         body {
             margin: 0;
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-            color: var(--text);
-            background: linear-gradient(120deg, var(--bg-start), var(--bg-end));
-            background-attachment: fixed;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
-
-        /* subtle noise overlay */
-        .noise {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.04"/></svg>');
-            background-size: 300px 300px;
+        button, input { font: inherit; }
+        a { color: inherit; }
+        .shell { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
+        .topbar {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line);
         }
-
-        .container {
-            width: min(1100px, 92%);
-            margin: 48px auto 64px;
+        .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 15px; font-weight: 750; letter-spacing: -.03em; text-decoration: none; }
+        .brand-mark {
+            width: 34px; height: 34px; display: grid; place-items: center;
+            border-radius: 11px; background: var(--ink); color: var(--green); font-size: 19px;
         }
-
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(14px) saturate(120%);
-            -webkit-backdrop-filter: blur(14px) saturate(120%);
-            border-radius: 20px;
-        }
-
+        .top-note { color: var(--muted); font-size: 13px; }
         .hero {
-            padding: 28px 28px 18px;
+            min-height: 328px;
+            margin: 34px 0 56px;
+            padding: 52px 58px;
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr 250px;
             align-items: center;
-            gap: 16px;
+            gap: 36px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 25px;
+            background: var(--ink);
+            color: #fff;
         }
-        .hero h1 {
-            margin: 0;
-            font-size: clamp(24px, 4vw, 36px);
-            letter-spacing: 0.3px;
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 310px; height: 310px;
+            right: 112px; top: -185px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 50%;
+            box-shadow: 0 0 0 34px rgba(255,255,255,.025), 0 0 0 70px rgba(255,255,255,.025);
+            pointer-events: none;
         }
-        .hero p {
-            margin: 6px 0 0;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .chips { display: flex; gap: 10px; flex-wrap: wrap; }
-        .chip {
-            display: inline-flex;
+        .eyebrow { margin: 0 0 18px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .15em; text-transform: uppercase; }
+        h1 { max-width: 580px; margin: 0; font-size: clamp(36px, 5vw, 58px); line-height: 1.12; letter-spacing: -.055em; }
+        .hero-copy { max-width: 480px; margin: 18px 0 0; color: #b6bdb8; font-size: 15px; line-height: 1.8; }
+        .hero-art {
+            z-index: 1;
+            min-height: 176px;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--card-strong);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            color: var(--text);
-            text-decoration: none;
-            transition: transform .12s ease, background-color .12s ease, box-shadow .12s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,.10);
+            justify-content: center;
+            position: relative;
         }
-        .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.16); }
-        .chip svg { width: 16px; height: 16px; opacity: .8; }
-
-        .search {
-            margin-top: 14px;
-            padding: 0 18px 18px;
+        .orbit { width: 170px; height: 170px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; }
+        .orbit::before, .orbit::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; }
+        .orbit::before { width: 124px; height: 124px; }
+        .orbit::after { width: 76px; height: 76px; }
+        .orbit-core { width: 48px; height: 48px; z-index: 1; display: grid; place-items: center; border-radius: 15px; background: var(--green); color: var(--ink); font-size: 25px; font-weight: 800; transform: rotate(-8deg); }
+        .spark { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+        .spark.one { right: 28px; top: 28px; }
+        .spark.two { left: 22px; bottom: 24px; width: 6px; height: 6px; opacity: .6; }
+        .section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 19px; }
+        .section-kicker { margin: 0 0 7px; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+        h2 { margin: 0; font-size: 26px; letter-spacing: -.045em; }
+        .result-count { color: var(--muted); font-size: 13px; }
+        .search-wrap { position: relative; margin-bottom: 18px; }
+        .search-icon { position: absolute; top: 50%; left: 17px; width: 18px; height: 18px; color: #8d958e; transform: translateY(-50%); pointer-events: none; }
+        #q {
+            width: 100%; min-height: 56px; padding: 0 18px 0 48px;
+            border: 1px solid var(--line); border-radius: 14px;
+            outline: none; background: var(--surface); color: var(--ink);
+            box-shadow: 0 3px 12px rgba(28,39,30,.025);
+            font-size: 14px; transition: border-color .16s, box-shadow .16s;
         }
-        .searchbar {
-            display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
-            background: var(--card-strong);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 10px 12px 10px 14px;
-        }
-        .searchbar input {
-            border: 0; outline: 0; background: transparent; color: var(--text);
-            font-size: 15px;
-        }
-        .meta {
-            display: flex; justify-content: space-between; align-items: center; margin-top: 12px;
-            color: var(--muted); font-size: 13px;
-        }
-
-        .list { margin-top: 14px; padding: 10px; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
-        }
+        #q::placeholder { color: #a1a8a1; }
+        #q:focus { border-color: #9fca52; box-shadow: 0 0 0 4px rgba(197,242,100,.23); }
+        .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
         .item {
-            background: var(--card-strong);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px;
-            display: grid;
-            grid-template-rows: auto auto auto;
-            gap: 8px;
-            transition: transform .12s ease, box-shadow .12s ease;
+            min-width: 0; min-height: 153px; padding: 18px;
+            display: flex; flex-direction: column; justify-content: space-between; gap: 17px;
+            border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         }
-        .item:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.15); }
-        .alias { font-weight: 700; letter-spacing: .3px; }
-        .target a { color: var(--muted); text-decoration: none; word-break: break-all; }
-        .target a:hover { text-decoration: underline; }
-        .short { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; color: var(--muted); }
-
-        .actions { display: flex; gap: 8px; justify-content: flex-end; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
-            background: #ffffffc7; color: #111827; text-decoration: none; cursor: pointer;
+        .item:hover { transform: translateY(-3px); border-color: #d4dec8; box-shadow: var(--shadow); }
+        .item-top { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+        .alias { min-width: 0; font-size: 15px; font-weight: 750; letter-spacing: -.025em; overflow-wrap: anywhere; }
+        .link-mark { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; background: #f2f4ef; color: #606b60; }
+        .link-mark svg { width: 15px; height: 15px; }
+        .target { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+        .item-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .short { min-width: 0; color: #6d776e; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .copy {
+            flex: none; min-height: 34px; padding: 0 11px; display: inline-flex; align-items: center; gap: 7px;
+            border: 1px solid #e7eae3; border-radius: 10px; background: #fff; color: #39453b;
+            cursor: pointer; font-size: 12px; font-weight: 650; transition: background .15s, border-color .15s;
         }
-        @media (prefers-color-scheme: dark) { .btn { background: rgba(255,255,255,0.06); color: var(--text); } }
-        .btn:hover { filter: brightness(1.05); }
-        .btn svg { width: 16px; height: 16px; }
-
-        .empty { text-align: center; color: var(--muted); padding: 28px; }
-
-        .footer { margin-top: 18px; padding: 14px 18px; text-align: center; color: var(--muted); font-size: 12px; }
-
-        /* toast */
+        .copy:hover { border-color: #c5f264; background: #f8fceF; }
+        .copy svg { width: 14px; height: 14px; }
+        .empty { padding: 56px 20px; border: 1px dashed #d8ddd4; border-radius: var(--radius); color: var(--muted); text-align: center; }
+        [hidden] { display: none !important; }
+        .footer { padding: 38px 0 30px; margin-top: 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.8; text-align: center; }
+        .footer code { padding: 3px 6px; border-radius: 5px; background: #e9ece5; color: #4f5c4f; }
         .toast {
-            position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
-            background: var(--card-strong);
-            border: 1px solid var(--border);
-            border-radius: 999px; padding: 10px 14px; color: var(--text);
-            box-shadow: var(--shadow);
-            opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+            position: fixed; z-index: 5; left: 50%; bottom: 24px; padding: 12px 17px;
+            border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+            background: var(--ink); color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.18);
+            font-size: 13px; opacity: 0; pointer-events: none; transform: translate(-50%, 8px);
+            transition: opacity .18s ease, transform .18s ease;
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+        @media (max-width: 760px) {
+            .shell { width: min(100% - 32px, 560px); }
+            .topbar { height: 68px; }
+            .top-note { font-size: 11px; }
+            .hero { min-height: 0; margin: 22px 0 43px; padding: 38px 30px; grid-template-columns: 1fr 120px; gap: 10px; }
+            .hero-art { min-height: 120px; }
+            .orbit { width: 112px; height: 112px; }
+            .orbit::before { width: 84px; height: 84px; }
+            .orbit::after { width: 55px; height: 55px; }
+            .orbit-core { width: 38px; height: 38px; border-radius: 12px; font-size: 20px; }
+            .spark.one { right: 1px; top: 9px; }
+            .spark.two { left: 0; bottom: 14px; }
+            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .shell { width: calc(100% - 28px); }
+            .brand { font-size: 13px; }
+            .brand-mark { width: 30px; height: 30px; }
+            .top-note { max-width: 115px; text-align: right; }
+            .hero { grid-template-columns: 1fr; padding: 32px 25px 24px; }
+            .hero h1 { font-size: 39px; }
+            .hero-copy { margin-top: 13px; font-size: 14px; }
+            .hero-art { display: none; }
+            .section-head { align-items: center; }
+            h2 { font-size: 23px; }
+            .grid { grid-template-columns: 1fr; gap: 10px; }
+            .item { min-height: 139px; }
+            .footer { margin-top: 36px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
     </style>
 </head>
-
 <body>
-    <div class="noise" aria-hidden="true"></div>
-    <main class="container">
-        <section class="hero card">
+    <header class="shell topbar">
+        <a class="brand" href="./" aria-label="Poy Chang 短網址首頁">
+            <span class="brand-mark" aria-hidden="true">↗</span>
+            <span>POY CHANG <span style="font-weight:450;color:#747c76">/ LINKS</span></span>
+        </a>
+        <span class="top-note">簡單、好記，快速抵達</span>
+    </header>
+    <main class="shell">
+        <section class="hero" aria-labelledby="page-title">
             <div>
-                <h1>短網址服務 · s.poychang.net</h1>
-                <p>快速分享、好看好記的短網址清單，支援搜尋與一鍵複製。</p>
-                <div id="chips" class="chips" aria-label="快速連結"></div>
+                <p class="eyebrow">A little link library</p>
+                <h1 id="page-title">好連結，<br>一搜就找到。</h1>
+                <p class="hero-copy">常用的網站、文章與小工具都收在這裡。搜尋關鍵字，或直接複製短網址分享。</p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <div class="orbit"><span class="orbit-core">↗</span></div>
+                <i class="spark one"></i><i class="spark two"></i>
             </div>
         </section>
-
-        <section class="search">
-            <div class="searchbar card">
-                <input id="q" type="search" placeholder="搜尋別名或目標網址… (e.g. blog, github)" aria-label="搜尋別名或目標網址" />
-                <div class="meta"><span id="count">載入中…</span></div>
+        <section aria-labelledby="links-title">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Browse links</p>
+                    <h2 id="links-title">短網址清單</h2>
+                </div>
+                <span class="result-count" id="count" aria-live="polite">載入中…</span>
             </div>
-        </section>
-
-        <section class="list card">
+            <label class="search-wrap">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+                <input id="q" type="search" placeholder="搜尋名稱或網址…" aria-label="搜尋短網址名稱或目標網址" autocomplete="off">
+            </label>
             <div id="grid" class="grid" aria-live="polite"></div>
-            <div id="empty" class="empty" hidden>查無結果</div>
+            <div id="empty" class="empty" hidden>找不到符合的短網址，試試其他關鍵字。</div>
         </section>
-
-        <div class="footer card">本服務使用 GitHub Pages + 404 重新導向。新增/修改短網址請更新 <code>routes.json</code>。</div>
+        <footer class="footer">Short links, made simple.<br>新增或修改短網址，請更新 <code>routes.json</code>。</footer>
     </main>
-
     <div id="toast" class="toast" role="status" aria-live="polite">已複製短網址</div>
-
     <script>
-        (function () {
-            const $ = (sel) => document.querySelector(sel);
-            const grid = $('#grid');
-            const empty = $('#empty');
-            const count = $('#count');
-            const q = $('#q');
-            const chips = $('#chips');
-            const toast = $('#toast');
+        (() => {
+            const grid = document.querySelector('#grid');
+            const empty = document.querySelector('#empty');
+            const count = document.querySelector('#count');
+            const query = document.querySelector('#q');
+            const toast = document.querySelector('#toast');
+            const base = location.protocol.startsWith('http') ? location.origin : 'https://s.poychang.net';
+            let toastTimer;
 
-            const base = (location && location.protocol.startsWith('http')) ? location.origin : 'https://s.poychang.net';
-
-            const iconCopy = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3V7Zm3-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-7Z"/><path d="M3 10a3 3 0 0 1 3-3h1a1 1 0 1 1 0 2H6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a1 1 0 1 1 2 0v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8Z"/></svg>';
-            const iconExternal = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3a1 1 0 1 0 0 2h4.586l-6.293 6.293a1 1 0 1 0 1.414 1.414L19 6.414V11a1 1 0 1 0 2 0V4a1 1 0 0 0-1-1h-7Z"/><path d="M5 6a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3v-2a1 1 0 1 0-2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h2a1 1 0 1 0 0-2H5Z"/></svg>';
-
-            function toastMsg(msg) {
-                toast.textContent = msg;
+            function showToast(message) {
+                toast.textContent = message;
                 toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 1400);
-            }
-
-            function truncate(str, n) {
-                if (!str) return '';
-                return str.length > n ? str.slice(0, n - 1) + '…' : str;
-            }
-
-            function shortUrl(alias) {
-                return `${base}/${alias}`;
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
             }
 
             function makeItem(alias, url) {
-                const div = document.createElement('div');
-                div.className = 'item';
-                const short = shortUrl(alias);
-                div.innerHTML = `
-                    <div class="alias">${alias}</div>
-                    <div class="target"><a href="${url}" target="_blank" rel="noopener">${truncate(url, 64)}</a></div>
-                    <div class="short">${short}</div>
-                    <div class="actions">
-                        <button class="btn btn-copy" data-copy="${short}" aria-label="複製短網址">${iconCopy}<span>複製</span></button>
-                        <a class="btn" href="${short}" target="_blank" rel="noopener" aria-label="開啟短網址">${iconExternal}<span>開啟</span></a>
-                    </div>
-                `;
-                const copyBtn = div.querySelector('.btn-copy');
-                copyBtn.addEventListener('click', async () => {
-                    const text = copyBtn.getAttribute('data-copy');
+                const shortUrl = `${base}/${encodeURIComponent(alias)}`;
+                const card = document.createElement('article');
+                card.className = 'item';
+
+                const top = document.createElement('div');
+                const topLine = document.createElement('div');
+                topLine.className = 'item-top';
+                const name = document.createElement('div');
+                name.className = 'alias';
+                name.textContent = alias;
+                const mark = document.createElement('span');
+                mark.className = 'link-mark';
+                mark.setAttribute('aria-hidden', 'true');
+                mark.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.1 0l3-3A5 5 0 0 0 13 2.9l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"></path></svg>';
+                topLine.append(name, mark);
+                const target = document.createElement('p');
+                target.className = 'target';
+                target.textContent = url.replace(/^https?:\/\//, '');
+                top.append(topLine, target);
+
+                const bottom = document.createElement('div');
+                bottom.className = 'item-bottom';
+                const short = document.createElement('span');
+                short.className = 'short';
+                short.textContent = shortUrl.replace(/^https?:\/\//, '');
+                const copy = document.createElement('button');
+                copy.type = 'button';
+                copy.className = 'copy';
+                copy.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg><span>複製</span>';
+                copy.setAttribute('aria-label', `複製 ${alias} 短網址`);
+                copy.addEventListener('click', async () => {
                     try {
-                        if (navigator.clipboard && navigator.clipboard.writeText) {
-                            await navigator.clipboard.writeText(text);
+                        if (navigator.clipboard?.writeText) {
+                            await navigator.clipboard.writeText(shortUrl);
                         } else {
-                            const ta = document.createElement('textarea');
-                            ta.value = text; document.body.appendChild(ta); ta.select();
-                            document.execCommand('copy'); document.body.removeChild(ta);
+                            const temporary = document.createElement('textarea');
+                            temporary.value = shortUrl;
+                            temporary.style.position = 'fixed';
+                            temporary.style.opacity = '0';
+                            document.body.appendChild(temporary);
+                            temporary.select();
+                            const copied = document.execCommand('copy');
+                            temporary.remove();
+                            if (!copied) throw new Error('Copy command failed');
                         }
-                        toastMsg('已複製短網址');
-                    } catch (e) {
-                        console.error(e);
-                        toastMsg('複製失敗');
+                        showToast('已複製短網址');
+                    } catch (error) {
+                        showToast('複製失敗，請手動複製');
                     }
                 });
-                return div;
+                bottom.append(short, copy);
+                card.append(top, bottom);
+                return card;
             }
 
-            function render(list) {
-                grid.innerHTML = '';
-                if (!list || list.length === 0) {
-                    empty.hidden = false;
-                    count.textContent = '0 筆結果';
-                    return;
-                }
-                empty.hidden = true;
-                for (const [alias, url] of list) {
-                    grid.appendChild(makeItem(alias, url));
-                }
-                count.textContent = `${list.length} 筆結果`;
+            function render(entries) {
+                grid.replaceChildren();
+                empty.hidden = entries.length > 0;
+                count.textContent = `${entries.length} / ${allEntries.length} 個連結`;
+                for (const [alias, url] of entries) grid.appendChild(makeItem(alias, url));
             }
 
-            function setupSearch(entries) {
-                q.addEventListener('input', () => {
-                    const term = q.value.trim().toLowerCase();
-                    if (!term) return render(entries);
-                    const filtered = entries.filter(([alias, url]) =>
-                        alias.toLowerCase().includes(term) || url.toLowerCase().includes(term)
-                    );
-                    render(filtered);
-                });
-            }
+            let allEntries = [];
+            query.addEventListener('input', () => {
+                const term = query.value.trim().toLocaleLowerCase();
+                const filtered = allEntries.filter(([alias, url]) =>
+                    alias.toLocaleLowerCase().includes(term) || url.toLocaleLowerCase().includes(term)
+                );
+                render(filtered);
+            });
 
             fetch(`routes.json?t=${Date.now()}`)
-                .then(r => r.json())
-                .then(routes => {
-                    const entries = Object.entries(routes);//.sort((a, b) => a[0].localeCompare(b[0]));
-                    render(entries);
-                    setupSearch(entries);
+                .then(response => {
+                    if (!response.ok) throw new Error('Unable to load routes');
+                    return response.json();
                 })
-                .catch(err => {
-                    console.error(err);
-                    count.textContent = '載入失敗，請稍後再試。';
+                .then(routes => {
+                    allEntries = Object.entries(routes).filter(([, value]) => {
+                        try {
+                            const protocol = new URL(value).protocol;
+                            return protocol === 'http:' || protocol === 'https:';
+                        } catch {
+                            return false;
+                        }
+                    });
+                    render(allEntries);
+                })
+                .catch(() => {
+                    count.textContent = '載入失敗';
+                    empty.textContent = '短網址清單暫時無法載入，請稍後再試。';
                     empty.hidden = false;
                 });
         })();
     </script>
 </body>
-
 </html>
